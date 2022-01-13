@@ -1,21 +1,30 @@
-import fs from "fs";
-// import { v4 as uuidv4 } from "uuid";
+const fs = require("fs");
+const { v4: uuidv4 } = require("uuid");
+const DEFAULT = 0;
 
 //add a user
-function addUser(userName, userEmail) {
+function addUser(userCash, userCredit, userPassID) {
   const users = loadUsers();
-
-  users.push({
-    id: uuidv4(),
-    name: userName,
-    email: userEmail,
+  const findUser = users.find((user) => {
+    return user.passID === userPassID;
   });
 
-  saveUser(users);
+  if (findUser) {
+    return "User already exist";
+  } else {
+    const newUser = {
+      id: uuidv4(),
+      cash: userCash || DEFAULT,
+      credit: userCredit || DEFAULT,
+      passID: userPassID,
+    };
+    users.push(newUser);
+    saveUser(users);
+    return newUser;
+  }
 }
 
 //delete a user
-
 function removeUser(userID) {
   const users = loadUsers();
 
@@ -25,6 +34,77 @@ function removeUser(userID) {
 
   saveUser(newUsers);
 }
+
+//Can deposit cash to a user
+function updateDeposit(userID, moneyAmount) {
+  const users = loadUsers();
+
+  let theUser = users.find((user) => {
+    return user.id === userID;
+  });
+
+  if (theUser) {
+    theUser = { ...theUser, cash: theUser.cash + moneyAmount };
+    const newUsers = users.map((user) => {
+      return user.id === userID ? theUser : user;
+    });
+    saveUser(newUsers);
+    return theUser;
+  } else {
+    return "User doesn't exist";
+  }
+}
+
+//update a users credit
+function updateCredit(userID, moneyAmount) {
+  if (moneyAmount < 0) return "Can't update credit with negative number";
+
+  const users = loadUsers();
+
+  let theUser = users.find((user) => {
+    return user.id === userID;
+  });
+
+  if (theUser) {
+    theUser = { ...theUser, credit: theUser.credit + moneyAmount };
+    const newUsers = users.map((user) => {
+      return user.id === userID ? theUser : user;
+    });
+    saveUser(newUsers);
+    return theUser;
+  } else {
+    return "User doesn't exist";
+  }
+}
+
+//withdraw money from the user 
+function withdrawMoney(userID, moneyAmount){
+  if (moneyAmount < 0) return "Can't withdraw money with negative number";
+
+  const users = loadUsers();
+
+  let theUser = users.find((user) => {
+    return user.id === userID;
+  });
+
+  if (theUser){
+    if(theUser.cash + theUser.credit > moneyAmount){
+      theUser = { ...theUser, cash: theUser.cash - moneyAmount };
+      if (theUser.cash < 0) theUser = { ...theUser, credit: theUser.credit + theUser.cash, cash:DEFAULT };
+      const newUsers = users.map((user) => {
+        return user.id === userID ? theUser : user;
+      });
+      saveUser(newUsers);
+      return theUser;
+    }else {
+      return ("Doesn't have enough money")
+    }
+  } else {
+    return ("User doesn't exist");
+  }
+}
+
+
 
 //update a user
 function updateUser(userID, userName, userEmail) {
@@ -56,7 +136,7 @@ function readUser(userID) {
   });
 
   if (user) {
-    console.log("name: ", user.name, "email: ", user.email);
+    return { name: user.name, email: user.email };
   } else {
     console.log("User not found");
   }
@@ -77,5 +157,12 @@ const loadUsers = () => {
   }
 };
 
-
-module.exports={readUser, updateUser, removeUser, addUser};
+module.exports = {
+  readUser,
+  updateUser,
+  removeUser,
+  addUser,
+  updateDeposit,
+  updateCredit,
+  withdrawMoney,
+};

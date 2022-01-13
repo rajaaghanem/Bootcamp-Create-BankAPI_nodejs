@@ -7,26 +7,36 @@ const utilis = require("./users.js");
 app.use(express.json());
 
 //return the array of numbers to the client
-app.get("/numbers", (req, res) => {
-  res.send(array);
+app.get("/clints/:id", (req, res) => {
+  res.send(utilis.readUser(req.params.id));
 });
 
 //create a new number that you are
 //getting from the body and append it to your array of numbers,
 //send the array back to the client
-app.post("/numbers", (req, res) => {
-  if (array.includes(req.body.number)) {
-    return res.status(400).send("number already exists");
-  } else {
-    array.push(req.body.number);
-    res.send(array);
-  }
+app.post("/users", (req, res) => {
+  res.send(utilis.addUser(req.body.cash, req.body.credit, req.body.passID));
 });
+
+//Can deposit cash to a user
+app.put("/users/:id", (req, res) => {
+  res.send(utilis.updateDeposit(req.params.id, req.body.amount));
+});
+
+app.put("/users/credit/:id", (req, res) => {
+  res.send(utilis.updateCredit(req.params.id, req.body.amount));
+});
+
+app.put("/users/withdraw/:id", (req, res) => {
+  res.send(utilis.withdrawMoney(req.params.id, req.body.amount));
+});
+
+
 
 //get the number you want to remove
 //from your params, remove the number from your array of
 //numbers, send the array back to the client
-app.delete("/numbers/:num", (req, res) => {
+app.delete("/users/:id", (req, res) => {
   if (!array.includes(Number(req.params.num))) {
     return res.status(400).send("number doesnt exist");
   } else {
@@ -42,7 +52,7 @@ app.delete("/numbers/:num", (req, res) => {
 // your params, get the new number you want to be replaced
 // from your body, modify the number from your array of
 // numbers, send the array back to the client.
-app.put("/numbers/:num", (req, res) => {
+app.put("/users/:id", (req, res) => {
   if (!array.includes(Number(req.params.num))) {
     return res.status(400).send("number doesnt exist");
   } else {
