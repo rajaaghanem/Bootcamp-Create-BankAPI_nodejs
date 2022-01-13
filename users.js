@@ -175,6 +175,11 @@ function readUser(userID) {
   }
 }
 
+function readAllUsers() {
+  const users = loadUsers();
+  return users;
+}
+
 const saveUser = (users) => {
   const dataJson = JSON.stringify(users);
   fs.writeFileSync("users.json", dataJson);
@@ -199,4 +204,5 @@ module.exports = {
   updateCredit,
   withdrawMoney,
   transferMoney,
+  readAllUsers,
 };
