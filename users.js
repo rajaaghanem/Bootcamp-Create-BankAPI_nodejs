@@ -104,7 +104,40 @@ function withdrawMoney(userID, moneyAmount){
   }
 }
 
+// transfer money from one user to another with credit
+function transferMoney(transferID, reciverID, moneyAmount){
+  if (moneyAmount < 0) return "Can't transfer money with negative number";
 
+  const users = loadUsers();
+
+  let transferUser = users.find((user) => {
+    return user.id === transferID;
+  });
+
+  if(!transferUser) return ("Transfer user doesn't exist");
+
+  let  reciverUser = users.find((user) => {
+    return user.id === reciverID;
+  });
+
+  if(!reciverUser) return ("Reciver user doesn't exist");
+ 
+  if(transferUser.cash + transferUser.credit > moneyAmount){
+    transferUser = { ...transferUser, cash: transferUser.cash - moneyAmount };
+    if (transferUser.cash < 0) transferUser = { ...transferUser, credit: transferUser.credit + transferUser.cash, cash:DEFAULT };
+    reciverUser= {... reciverUser, credit: reciverUser.credit+ moneyAmount}
+    const newUsers = users.map((user) => {
+      if (user.id === transferID) return transferUser;
+      else if (user.id === reciverID) return reciverUser;
+      else return user;
+    });
+    saveUser(newUsers);
+    return ([transferUser, reciverUser]);
+  }else {
+    return ("Doesn't have enough money");
+  }
+
+}
 
 //update a user
 function updateUser(userID, userName, userEmail) {
@@ -165,4 +198,5 @@ module.exports = {
   updateDeposit,
   updateCredit,
   withdrawMoney,
+  transferMoney,
 };

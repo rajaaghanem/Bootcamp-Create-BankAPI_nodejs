@@ -31,7 +31,9 @@ app.put("/users/withdraw/:id", (req, res) => {
   res.send(utilis.withdrawMoney(req.params.id, req.body.amount));
 });
 
-
+app.put("/users/transfer/:id", (req, res) => {
+  res.send(utilis.transferMoney(req.params.id, req.body.id, req.body.amount));
+});
 
 //get the number you want to remove
 //from your params, remove the number from your array of
