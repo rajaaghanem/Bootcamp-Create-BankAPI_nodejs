@@ -1,0 +1,16 @@
+{
+  "name": "npm-test",
+  "version": "1.0.0",
+  "description": "",
+  "main": "coloring-npm.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "chalk": "^2.4.1",
+    "express": "^4.17.2",
+    "uuid": "^8.3.2"
+  }
+}
