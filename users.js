@@ -24,24 +24,11 @@ function addUser(userCash, userCredit, userPassID) {
   }
 }
 
-//delete a user
-function removeUser(userID) {
-  const users = loadUsers();
-
-  const newUsers = users.filter((user) => {
-    return user.id !== userID;
-  });
-
-  saveUser(newUsers);
-}
-
 //Can deposit cash to a user
 function updateDeposit(userID, moneyAmount) {
   const users = loadUsers();
 
-  let theUser = users.find((user) => {
-    return user.id === userID;
-  });
+  let theUser = findUser(userID);
 
   if (theUser) {
     theUser = { ...theUser, cash: theUser.cash + moneyAmount };
@@ -61,9 +48,7 @@ function updateCredit(userID, moneyAmount) {
 
   const users = loadUsers();
 
-  let theUser = users.find((user) => {
-    return user.id === userID;
-  });
+  let theUser = findUser(userID);
 
   if (theUser) {
     theUser = { ...theUser, credit: theUser.credit + moneyAmount };
@@ -77,99 +62,90 @@ function updateCredit(userID, moneyAmount) {
   }
 }
 
-//withdraw money from the user 
-function withdrawMoney(userID, moneyAmount){
+//withdraw money from the user
+function withdrawMoney(userID, moneyAmount) {
   if (moneyAmount < 0) return "Can't withdraw money with negative number";
 
   const users = loadUsers();
 
-  let theUser = users.find((user) => {
-    return user.id === userID;
-  });
+  let theUser = findUser(userID);
 
-  if (theUser){
-    if(theUser.cash + theUser.credit > moneyAmount){
+  if (theUser) {
+    if (theUser.cash + theUser.credit > moneyAmount) {
       theUser = { ...theUser, cash: theUser.cash - moneyAmount };
-      if (theUser.cash < 0) theUser = { ...theUser, credit: theUser.credit + theUser.cash, cash:DEFAULT };
+      if (theUser.cash < 0)
+        theUser = {
+          ...theUser,
+          credit: theUser.credit + theUser.cash,
+          cash: DEFAULT,
+        };
       const newUsers = users.map((user) => {
         return user.id === userID ? theUser : user;
       });
       saveUser(newUsers);
       return theUser;
-    }else {
-      return ("Doesn't have enough money")
+    } else {
+      return "Doesn't have enough money";
     }
   } else {
-    return ("User doesn't exist");
+    return "User doesn't exist";
   }
 }
 
 // transfer money from one user to another with credit
-function transferMoney(transferID, reciverID, moneyAmount){
+function transferMoney(transferID, reciverID, moneyAmount) {
   if (moneyAmount < 0) return "Can't transfer money with negative number";
 
   const users = loadUsers();
 
-  let transferUser = users.find((user) => {
-    return user.id === transferID;
-  });
+  let transferUser = findUser(transferID);
 
-  if(!transferUser) return ("Transfer user doesn't exist");
+  if (!transferUser) return "Transfer user doesn't exist";
 
-  let  reciverUser = users.find((user) => {
-    return user.id === reciverID;
-  });
+  let reciverUser = findUser(reciverID);
 
-  if(!reciverUser) return ("Reciver user doesn't exist");
- 
-  if(transferUser.cash + transferUser.credit > moneyAmount){
+  if (!reciverUser) return "Reciver user doesn't exist";
+
+  if (transferUser.cash + transferUser.credit > moneyAmount) {
     transferUser = { ...transferUser, cash: transferUser.cash - moneyAmount };
-    if (transferUser.cash < 0) transferUser = { ...transferUser, credit: transferUser.credit + transferUser.cash, cash:DEFAULT };
-    reciverUser= {... reciverUser, credit: reciverUser.credit+ moneyAmount}
+    if (transferUser.cash < 0)
+      transferUser = {
+        ...transferUser,
+        credit: transferUser.credit + transferUser.cash,
+        cash: DEFAULT,
+      };
+    reciverUser = { ...reciverUser, credit: reciverUser.credit + moneyAmount };
     const newUsers = users.map((user) => {
       if (user.id === transferID) return transferUser;
       else if (user.id === reciverID) return reciverUser;
       else return user;
     });
     saveUser(newUsers);
-    return ([transferUser, reciverUser]);
-  }else {
-    return ("Doesn't have enough money");
+    return [transferUser, reciverUser];
+  } else {
+    return "Doesn't have enough money";
   }
-
 }
 
-//update a user
-function updateUser(userID, userName, userEmail) {
+//find user by given id
+function findUser(userID) {
   const users = loadUsers();
 
-  const theUser = users.find((user) => {
+  const user = users.find((user) => {
     return user.id === userID;
   });
 
-  if (theUser) {
-    const editedUser = {
-      id: userID,
-      name: userName || theUser.name,
-      email: userEmail || theUser.email,
-    };
-    const newUsers = users.map((user) => {
-      return user.id === userID ? editedUser : user;
-    });
-    saveUser(newUsers);
-  }
+  return user;
 }
 
 //read a user
 
 function readUser(userID) {
   const users = loadUsers();
-  const user = users.find((user) => {
-    return user.id === userID;
-  });
+  const user = findUser(userID);
 
   if (user) {
-    return { name: user.name, email: user.email };
+    return user;
   } else {
     console.log("User not found");
   }
@@ -197,8 +173,6 @@ const loadUsers = () => {
 
 module.exports = {
   readUser,
-  updateUser,
-  removeUser,
   addUser,
   updateDeposit,
   updateCredit,

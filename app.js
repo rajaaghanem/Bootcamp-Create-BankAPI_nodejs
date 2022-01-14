@@ -36,7 +36,7 @@ app.put("/users/withdraw/:id", (req, res) => {
   res.send(utilis.withdrawMoney(req.params.id, req.body.amount));
 });
 
-// n transfer money from one user to another with credit
+// transfer money from one user to another with credit
 app.put("/users/transfer/:id", (req, res) => {
   res.send(utilis.transferMoney(req.params.id, req.body.id, req.body.amount));
 });
