@@ -10,7 +10,7 @@ function addUser(userCash, userCredit, userPassID) {
   });
 
   if (findUser) {
-    return "User already exist";
+    throw Error("User already exist");
   } else {
     const newUser = {
       id: uuidv4(),
@@ -38,13 +38,13 @@ function updateDeposit(userID, moneyAmount) {
     saveUser(newUsers);
     return theUser;
   } else {
-    return "User doesn't exist";
+    throw Error ("User doesn't exist");
   }
 }
 
 //update a users credit
 function updateCredit(userID, moneyAmount) {
-  if (moneyAmount < 0) return "Can't update credit with negative number";
+  if (moneyAmount < 0) throw Error ("Can't update credit with negative number");
 
   const users = loadUsers();
 
@@ -58,13 +58,13 @@ function updateCredit(userID, moneyAmount) {
     saveUser(newUsers);
     return theUser;
   } else {
-    return "User doesn't exist";
+    throw Error ("User doesn't exist");
   }
 }
 
 //withdraw money from the user
 function withdrawMoney(userID, moneyAmount) {
-  if (moneyAmount < 0) return "Can't withdraw money with negative number";
+  if (moneyAmount < 0) throw Error ("Can't withdraw money with negative number");
 
   const users = loadUsers();
 
@@ -85,26 +85,26 @@ function withdrawMoney(userID, moneyAmount) {
       saveUser(newUsers);
       return theUser;
     } else {
-      return "Doesn't have enough money";
+      throw Error ("Doesn't have enough money");
     }
   } else {
-    return "User doesn't exist";
+    throw Error ("User doesn't exist");
   }
 }
 
 // transfer money from one user to another with credit
 function transferMoney(transferID, reciverID, moneyAmount) {
-  if (moneyAmount < 0) return "Can't transfer money with negative number";
+  if (moneyAmount < 0) throw Error ("Can't transfer money with negative number");
 
   const users = loadUsers();
 
   let transferUser = findUser(transferID);
 
-  if (!transferUser) return "Transfer user doesn't exist";
+  if (!transferUser) throw Error("Transfer user doesn't exist");
 
   let reciverUser = findUser(reciverID);
 
-  if (!reciverUser) return "Reciver user doesn't exist";
+  if (!reciverUser) throw Error ("Reciver user doesn't exist");
 
   if (transferUser.cash + transferUser.credit > moneyAmount) {
     transferUser = { ...transferUser, cash: transferUser.cash - moneyAmount };
@@ -123,7 +123,7 @@ function transferMoney(transferID, reciverID, moneyAmount) {
     saveUser(newUsers);
     return [transferUser, reciverUser];
   } else {
-    return "Doesn't have enough money";
+    throw Error ("Doesn't have enough money");
   }
 }
 
@@ -139,7 +139,6 @@ function findUser(userID) {
 }
 
 //read a user
-
 function readUser(userID) {
   const users = loadUsers();
   const user = findUser(userID);
@@ -147,7 +146,7 @@ function readUser(userID) {
   if (user) {
     return user;
   } else {
-    console.log("User not found");
+    throw Error("User not found");
   }
 }
 
@@ -180,3 +179,5 @@ module.exports = {
   transferMoney,
   readAllUsers,
 };
+
+
