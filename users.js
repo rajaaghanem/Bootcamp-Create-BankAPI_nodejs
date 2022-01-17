@@ -38,13 +38,13 @@ function updateDeposit(userID, moneyAmount) {
     saveUser(newUsers);
     return theUser;
   } else {
-    throw Error ("User doesn't exist");
+    throw Error("User doesn't exist");
   }
 }
 
 //update a users credit
 function updateCredit(userID, moneyAmount) {
-  if (moneyAmount < 0) throw Error ("Can't update credit with negative number");
+  if (moneyAmount < 0) throw Error("Can't update credit with negative number");
 
   const users = loadUsers();
 
@@ -58,13 +58,25 @@ function updateCredit(userID, moneyAmount) {
     saveUser(newUsers);
     return theUser;
   } else {
-    throw Error ("User doesn't exist");
+    throw Error("User doesn't exist");
   }
+}
+
+//if the use have enough money change the cash and the credit of the user by moneyAmount
+function enoughMoney(theUser, moneyAmount) {
+  theUser = { ...theUser, cash: theUser.cash - moneyAmount };
+  if (theUser.cash < 0)
+    theUser = {
+      ...theUser,
+      credit: theUser.credit + theUser.cash,
+      cash: DEFAULT,
+    };
+  return theUser;
 }
 
 //withdraw money from the user
 function withdrawMoney(userID, moneyAmount) {
-  if (moneyAmount < 0) throw Error ("Can't withdraw money with negative number");
+  if (moneyAmount < 0) throw Error("Can't withdraw money with negative number");
 
   const users = loadUsers();
 
@@ -72,29 +84,23 @@ function withdrawMoney(userID, moneyAmount) {
 
   if (theUser) {
     if (theUser.cash + theUser.credit > moneyAmount) {
-      theUser = { ...theUser, cash: theUser.cash - moneyAmount };
-      if (theUser.cash < 0)
-        theUser = {
-          ...theUser,
-          credit: theUser.credit + theUser.cash,
-          cash: DEFAULT,
-        };
+      theUser = enoughMoney(theUser, moneyAmount);
       const newUsers = users.map((user) => {
         return user.id === userID ? theUser : user;
       });
       saveUser(newUsers);
       return theUser;
     } else {
-      throw Error ("Doesn't have enough money");
+      throw Error("Doesn't have enough money");
     }
   } else {
-    throw Error ("User doesn't exist");
+    throw Error("User doesn't exist");
   }
 }
 
 // transfer money from one user to another with credit
 function transferMoney(transferID, reciverID, moneyAmount) {
-  if (moneyAmount < 0) throw Error ("Can't transfer money with negative number");
+  if (moneyAmount < 0) throw Error("Can't transfer money with negative number");
 
   const users = loadUsers();
 
@@ -104,17 +110,13 @@ function transferMoney(transferID, reciverID, moneyAmount) {
 
   let reciverUser = findUser(reciverID);
 
-  if (!reciverUser) throw Error ("Reciver user doesn't exist");
+  if (!reciverUser) throw Error("Reciver user doesn't exist");
 
   if (transferUser.cash + transferUser.credit > moneyAmount) {
-    transferUser = { ...transferUser, cash: transferUser.cash - moneyAmount };
-    if (transferUser.cash < 0)
-      transferUser = {
-        ...transferUser,
-        credit: transferUser.credit + transferUser.cash,
-        cash: DEFAULT,
-      };
+
+    transferUser = enoughMoney(transferUser, moneyAmount);
     reciverUser = { ...reciverUser, credit: reciverUser.credit + moneyAmount };
+
     const newUsers = users.map((user) => {
       if (user.id === transferID) return transferUser;
       else if (user.id === reciverID) return reciverUser;
@@ -122,8 +124,9 @@ function transferMoney(transferID, reciverID, moneyAmount) {
     });
     saveUser(newUsers);
     return [transferUser, reciverUser];
+    
   } else {
-    throw Error ("Doesn't have enough money");
+    throw Error("Doesn't have enough money");
   }
 }
 
@@ -179,5 +182,3 @@ module.exports = {
   transferMoney,
   readAllUsers,
 };
-
-

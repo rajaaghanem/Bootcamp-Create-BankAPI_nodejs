@@ -1,7 +1,7 @@
 [
   {
     "id": "e9d456a2-d18e-4810-87af-f0f07781ee45",
-    "cash": 20,
+    "cash": 5,
     "credit": 0,
     "passID": "1234"
   },
@@ -14,13 +14,13 @@
   {
     "id": "e06b6d17-690b-4a31-966c-7ecc20fb0041",
     "cash": 0,
-    "credit": 40,
+    "credit": 35,
     "passID": "3456"
   },
   {
     "id": "2c49768f-2fc1-4b3e-be2c-38dd1242668e",
     "cash": 10,
-    "credit": 20,
+    "credit": 30,
     "passID": "6758"
   }
 ]
