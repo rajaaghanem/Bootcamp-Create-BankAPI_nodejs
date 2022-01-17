@@ -11,6 +11,7 @@ function addUser(userCash, userCredit, userPassID) {
 
   if (findUser) {
     throw Error("User already exist");
+
   } else {
     const newUser = {
       id: uuidv4(),
@@ -18,6 +19,7 @@ function addUser(userCash, userCredit, userPassID) {
       credit: userCredit || DEFAULT,
       passID: userPassID,
     };
+
     users.push(newUser);
     saveUser(users);
     return newUser;
@@ -31,12 +33,15 @@ function updateDeposit(userID, moneyAmount) {
   let theUser = findUser(userID);
 
   if (theUser) {
+
     theUser = { ...theUser, cash: theUser.cash + moneyAmount };
     const newUsers = users.map((user) => {
       return user.id === userID ? theUser : user;
     });
+
     saveUser(newUsers);
     return theUser;
+
   } else {
     throw Error("User doesn't exist");
   }
@@ -65,12 +70,14 @@ function updateCredit(userID, moneyAmount) {
 //if the use have enough money change the cash and the credit of the user by moneyAmount
 function enoughMoney(theUser, moneyAmount) {
   theUser = { ...theUser, cash: theUser.cash - moneyAmount };
+
   if (theUser.cash < 0)
     theUser = {
       ...theUser,
       credit: theUser.credit + theUser.cash,
       cash: DEFAULT,
     };
+
   return theUser;
 }
 
@@ -83,13 +90,17 @@ function withdrawMoney(userID, moneyAmount) {
   let theUser = findUser(userID);
 
   if (theUser) {
+
     if (theUser.cash + theUser.credit > moneyAmount) {
+
       theUser = enoughMoney(theUser, moneyAmount);
       const newUsers = users.map((user) => {
+
         return user.id === userID ? theUser : user;
       });
       saveUser(newUsers);
       return theUser;
+
     } else {
       throw Error("Doesn't have enough money");
     }
@@ -105,11 +116,9 @@ function transferMoney(transferID, reciverID, moneyAmount) {
   const users = loadUsers();
 
   let transferUser = findUser(transferID);
-
   if (!transferUser) throw Error("Transfer user doesn't exist");
 
   let reciverUser = findUser(reciverID);
-
   if (!reciverUser) throw Error("Reciver user doesn't exist");
 
   if (transferUser.cash + transferUser.credit > moneyAmount) {
@@ -124,7 +133,7 @@ function transferMoney(transferID, reciverID, moneyAmount) {
     });
     saveUser(newUsers);
     return [transferUser, reciverUser];
-    
+
   } else {
     throw Error("Doesn't have enough money");
   }
@@ -168,6 +177,7 @@ const loadUsers = () => {
     const dataBuffer = fs.readFileSync("users.json");
     const dataJson = dataBuffer.toString();
     return JSON.parse(dataJson);
+    
   } catch (e) {
     return [];
   }
